@@ -1,0 +1,22 @@
+---
+- name: apply conf to all nodes
+  hosts: all
+  roles:
+#    - scathatheworm.security-settings
+    - database
+    - {role: jenkins, tags: 'jenkins'}
+    - ansible-role-ntpd
+    - role: logrotate
+      logrotate_backlog_size: 52
+    - role: packages
+      packages:
+        - name: curl
+          state: latest
+        - name: netperf
+          state: latest
+        - name: iotop
+          state: latest
+        - name: htop
+          state: latest
+        - name: i7z
+          state: latest

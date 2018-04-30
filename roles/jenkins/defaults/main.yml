@@ -1,0 +1,4 @@
+---
+# defaults file for jenkins
+JENKINS_FQN: jarvis
+JENKINS_SSH_PASS: lala

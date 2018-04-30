@@ -1,0 +1,124 @@
+---
+- name: Add OS specific variables
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Solaris - Configure ssh root login to {{sshrootlogin}}
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin.*'
+    line: 'PermitRootLogin {{sshrootlogin}}'
+    insertafter: '^# Valid options are yes, without-password, no.*'
+    state: present
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd
+
+- name: Solaris - restrict listen to IPv4 if desired
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^ListenAddress.*'
+    line: 'ListenAddress 0.0.0.0'
+    insertafter: '# IPv4 only'
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd
+  when: sshd_solaris_restrict_ipv4
+
+- name: Avoid trying to modify inherited_fs
+  command: touch /lib/svc/method/sshd
+  register: touch_sshd
+  always_run: True
+  failed_when: touch_sshd.rc > 1
+  changed_when: no
+  args:
+    warn: no
+
+- name: Solaris - restrict listen to IPv4 if desired (svc)
+  lineinfile:
+    dest: /lib/svc/method/sshd
+    regexp: '^\s*/usr/lib/ssh/sshd( -4|)\s*$'
+    line: "\t/usr/lib/ssh/sshd -4"
+    owner: root
+    group: bin
+    mode: 0555
+  notify: restart sshd
+  when:
+  - sshd_solaris_restrict_ipv4
+  - touch_sshd.rc == 0
+
+- name: Solaris - Remove unwanted Port lines from sshd_config
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#*Port (?!{{sshmainport}}|{{sshextraport}})'
+    state: absent
+
+- name: Solaris - SSH Listen on Main Port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    insertafter: '^# Listen port.*'
+    line: 'Port {{sshmainport}}'
+    state: present
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd
+
+- name: Solaris - SSH Listen on Extra Port
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'Port {{sshextraport}}'
+    insertafter: 'Port {{sshmainport}}'
+    state: present
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd
+  when: sshextraport != 0
+
+- name: Solaris - Create login banner as /etc/issue in Solaris
+  copy:
+    src: login_banner
+    dest: /etc/issue
+    owner: root
+    group: root
+    mode: 0444
+  when: setloginbanner
+
+- name: Solaris - Configure login banner in ssh
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'Banner /etc/issue'
+    insertafter: '# Banner to be printed before authentication starts.*'
+    state: "{{ 'present' if setloginbanner else 'absent' }}"
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd
+
+- name: SSH disable weak ciphers Solaris 10
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+    regexp: '^Ciphers.*$'
+    insertafter: '# Default Encryption algorithms and Message Authentication codes'
+    state: "{{ 'present' if ssh_enforce_ciphers else 'absent' }}"
+    owner: root
+    group: sys
+    mode: 0644
+  when:
+  - ansible_distribution == 'Solaris'
+  - ansible_distribution_version == '10'
+  notify: restart sshd
+
+- name: SSH disable weak HMACs Solaris 10
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    line: 'MACS    hmac-sha1'
+    insertafter: 'Ciphers aes128-ctr,aes192-ctr,aes256-ctr'
+    state: "{{ 'present' if ssh_enforce_ciphers else 'absent' }}"
+    owner: root
+    group: sys
+    mode: 0644
+  notify: restart sshd

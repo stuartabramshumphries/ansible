@@ -1,0 +1,5 @@
+---
+# tasks file for stuart.packer
+# Install apt packages and repositories
+- include: apt.yml
+  when: ansible_pkg_mgr == "apt"

@@ -1,0 +1,63 @@
+---
+- name: Set password complexity, aging and history for Solaris 10
+  template:
+    src: solaris10-default-passwd.j2
+    dest: /etc/default/passwd
+    owner: root
+    group: sys
+    mode: 0444
+
+- name: Set solaris login defaults
+  template:
+    src: solaris_default_login.j2
+    dest: /etc/default/login
+    owner: root
+    group: sys
+    mode: 0444
+
+- name: Set TCP strong initial random number
+  lineinfile:
+    dest: /etc/default/inetinit
+    regexp: '^TCP_STRONG_ISS.*'
+    line: 'TCP_STRONG_ISS=2'
+
+- name: Set lockout policy in Solaris 10
+  lineinfile:
+    dest: /etc/security/policy.conf
+    regexp: '^LOCK_AFTER_RETRIES.*'
+    line: 'LOCK_AFTER_RETRIES=YES'
+
+- name: Disable keyboard and serial physical sendbreak
+  lineinfile:
+    dest: /etc/default/kbd
+    regexp: '^#?KEYBOARD_ABORT=disable.*'
+    line: 'KEYBOARD_ABORT=disable'
+    insertafter: '# abort sequences'
+    state: present
+  when: 
+  - ansible_container is not defined
+  - disable_ctrlaltdel
+
+- name: Set accountunlock perl script
+  template:
+    src: accountunlock.j2
+    dest: "{{solaris_accountunlock_dir}}/bin/accountunlock"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Set header for ansible management of accountunlock cron job
+  lineinfile:
+    dest: /var/spool/cron/crontabs/root
+    regexp: '^# Script to unlock accounts.*'
+    backrefs: yes
+    insertbefore: "'* * * * * {{solaris_accountunlock_dir}}/accountunlock >/dev/null'"
+    line: '#Ansible{{":"}} Script to unlock accounts'
+
+- name: Script to unlock accounts
+  cron:
+    name: 'Script to unlock accounts'
+    user: root
+    state: present
+    job: '{{solaris_accountunlock_dir}}/bin/accountunlock >/dev/null'
+    disabled: "{{ 'yes' if fail_unlock==0 else 'no' }}"

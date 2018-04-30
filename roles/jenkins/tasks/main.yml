@@ -1,0 +1,43 @@
+---
+- apt_key: url=https://jenkins-ci.org/debian/jenkins-ci.org.key state=present
+  become: yes
+
+- apt_repository: repo='deb http://pkg.jenkins-ci.org/debian-stable binary/'
+  become: yes
+
+- apt: name=jenkins update_cache=yes cache_valid_time=300 state=latest
+  become: yes
+  notify: jenkins restart
+
+- service: name=jenkins enabled=yes
+  become: yes
+
+- apt: name=nginx update_cache=yes cache_valid_time=300 state=latest
+  become: yes
+  notify: nginx restart
+
+- service: name=nginx enabled=yes
+  become: yes
+
+- file: path=/etc/nginx/sites-enabled/default state=absent
+  become: yes
+  notify: nginx restart
+
+- template: src=jenkins.j2 dest=/etc/nginx/sites-available/jenkins
+  become: yes
+  notify: nginx restart
+
+- file: src=/etc/nginx/sites-available/jenkins dest=/etc/nginx/sites-enabled/jenkins state=link
+  become: yes
+  notify: nginx restart
+
+- user: name=jenkins generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa ssh_key_passphrase={{ JENKINS_SSH_PASS }}
+  become: yes
+
+- lineinfile: dest=/etc/default/jenkins line='JAVA_ARGS="$JAVA_ARGS -Dhudson.model.ParametersAction.safeParameters=RELEASE_VERSION,DEVELOPMENT_VERSION"'
+  become: yes
+  notify: jenkins restart
+
+- lineinfile: dest=/etc/default/jenkins line='JENKINS_ARGS="${JENKINS_ARGS} --prefix=$PREFIX"'
+  become: yes
+  notify: jenkins restart

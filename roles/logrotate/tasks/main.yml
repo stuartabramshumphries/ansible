@@ -1,0 +1,24 @@
+---
+# Configure sudo
+
+- name: system packages | install logrotate YUM
+  become: yes
+  yum:
+    pkg: logrotate
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: system packages | install logrotate APT
+  become: yes
+  apt:
+    pkg: logrotate
+    state: present
+  when: ansible_os_family == 'Debian'
+
+
+- name: logrotate | configure main file
+  become: yes
+  template:
+    backup: yes
+    dest: /etc/logrotate.conf
+    src: logrotate.conf.j2

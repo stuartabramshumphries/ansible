@@ -1,0 +1,8 @@
+---
+# defaults file for security
+
+security_sudoers_user: 'ops'
+security_sudoers_password: 'password'
+security_sudoers_user_key: ''
+security_sudoers_passwordless: false
+security_sudoers_passworded: true

@@ -1,0 +1,15 @@
+---
+crontabs:
+  vars:
+    - name: "TESTVAR1"
+      value: "valeur de test"
+    - name: "TESTVAR2"
+      value: "valeur de test 02"
+  jobs:
+    - name: "Test job 1"
+      job: "echo OK > /tmp/testcron"
+      user: root
+    - name: "Test job 2"
+      job: "echo OK > /tmp/testcron"
+      user: root
+

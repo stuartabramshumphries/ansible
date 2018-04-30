@@ -1,0 +1,12 @@
+---
+- name: move the needs
+  template:
+    src="sshd.j2"
+    dest="/etc/ssh/sshd_config"
+    owner=root
+    force=yes
+
+- name: restart ssh
+  service:
+    name=sshd
+    state=reloaded

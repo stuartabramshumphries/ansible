@@ -1,0 +1,6 @@
+[ansible-master]
+ubuntu
+[dbserver]
+ubuntu
+[ubuntu]
+ubuntu

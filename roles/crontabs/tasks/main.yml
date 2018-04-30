@@ -1,0 +1,60 @@
+---
+# I could have just used the template module instead of the cron module, but
+# this path is an interesting exercice for future 'manage deletion' approach.
+- name: List crontabs that ansible previously installed in managed cron file
+  shell: >
+    egrep '^#Ansible: ' /etc/cron.d/ansible_cron | cut -d ' ' -f2-
+  register: crons_in_file
+  ignore_errors: true
+  changed_when: no
+
+- name: Purge unwanted jobs in cronfile /etc/cron.d/ansible_cron (only this file)
+  cron:
+    name: '{{ item }}'
+    state: absent
+    cron_file: '/etc/cron.d/ansible_cron'
+  when: >
+    item not in crontabs.jobs | default([]) | map(attribute='name')
+  with_items: "{{ crons_in_file.stdout_lines }}"
+
+- name: List vars that ansible previously installed in this managed file
+  shell: >
+    egrep '^[A-Za-z0-9]+=".*"$' /etc/cron.d/ansible_cron | awk -F'=' '{ print $1 }'
+  register: vars_in_file
+  ignore_errors: true
+  changed_when: no
+
+- name: Purge unwanted vars in cronfile /etc/cron.d/ansible_cron (only this file)
+  cron:
+    name: "{{ item }}"
+    env: yes
+    state: absent
+    cron_file: '/etc/cron.d/ansible_cron'
+  when: >
+    item not in crontabs.vars | default([]) | map(attribute='name')
+  with_items: "{{ vars_in_file.stdout_lines }}"
+
+- name: Create env variables
+  cron:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    cron_file: "{{ item.file | default('/etc/cron.d/ansible_cron') }}"
+    user: "{{ item.user | default('root') }}"
+    env: yes
+  with_items:
+  - "{{ crontabs.vars | default([]) }}"
+
+- name: Create needed crontabs
+  cron:
+    name: "{{ item.name }}"
+    job: "{{ item.job }}"
+    cron_file: "{{ item.file | default('/etc/cron.d/ansible_cron') }}"
+    user: "{{ item.user | default('root') }}"
+    minute: "{{ item.minute | default('*') }}"
+    hour: "{{ item.hour | default('*') }}"
+    day: "{{ item.day | default('*') }}"
+    month: "{{ item.month | default('*') }}"
+    weekday: "{{ item.weekday | default('*') }}"
+    state: present
+  with_items:
+  - "{{ crontabs.jobs | default([]) }}"

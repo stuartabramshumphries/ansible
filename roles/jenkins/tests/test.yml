@@ -1,0 +1,29 @@
+---
+# - hosts: localhost
+#   remote_user: root
+#   roles:
+#     - jenkins
+- name: Remove existing ubuntu container
+  docker:
+    name: ubuntu
+    image: ubuntu/xenial
+    state: absent
+
+- name: Create ubuntu container
+  docker:
+    name: ubuntu
+    image: ubuntu/xenial
+    state: reloaded
+
+- name: Add container to inventory
+  add_host:
+    name: ubuntu
+    ansible_connection: docker
+    ansible_docker_extra_args: "--tlsverify --tlscacert=/path/to/ca.pem --tlscert=/path/to/client-cert.pem --tlskey=/path/to/client-key.pem -H=tcp://myserver.net:4243"
+  changed_when: false
+
+- name: create directory for ssh keys
+  delegate_to: my_jenkins
+  file:
+    path: "/var/jenkins_home/.ssh/jupiter"
+    state: directory

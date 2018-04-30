@@ -1,0 +1,28 @@
+---
+# file: roles/security/tasks/sudo.yml
+# Add sudo users
+- name: Add sudo user
+  user: name={{ security_sudoers_user }} password={{ security_sudoers_password }} state=present
+  when: security_sudoers_user | string
+
+- name: Add sudo user authorized key
+  authorized_key: user={{ security_sudoers_user }} key="{{ security_sudoers_user_key }}"
+  when: security_sudoers_user_key | string
+
+- name: Add configured user accounts to passwordless sudoers.
+  lineinfile: >
+    dest=/etc/sudoers
+    regexp='^{{ security_sudoers_user }}'
+    line='{{ security_sudoers_user }} ALL=(ALL) NOPASSWD: ALL'
+    state=present
+    validate='visudo -cf %s'
+  when: security_sudoers_passwordless
+
+- name: Add configured user accounts to passworded sudoers.
+  lineinfile: >
+    dest=/etc/sudoers
+    regexp='^{{ security_sudoers_user }}'
+    line='{{ security_sudoers_user }} ALL=(ALL) ALL'
+    state=present
+    validate='visudo -cf %s'
+  when: security_sudoers_passworded

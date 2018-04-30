@@ -1,0 +1,33 @@
+galaxy_info:
+  author: pascal@watteel.be
+  description: Customise log-rotation
+  company: EMC
+  license: BSD
+  min_ansible_version: 2.1
+  platforms:
+  - name: EL
+    versions:
+    - 7
+    - 6
+  - name: Ubuntu
+    versions:
+    - lucid
+    - maverick
+    - natty
+    - oneiric
+    - precise
+    - quantal
+    - raring
+    - saucy
+    - trusty
+  - name: Debian
+    versions:
+    - wheezy
+    - jessie
+
+  galaxy_tags:
+    - system
+    - logs
+    - logrotate
+
+dependencies: []

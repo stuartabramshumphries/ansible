@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+   - name: add repos
+     yum_repository:
+       name: epel
+       description: EPEL YUM repo
+       baseurl: http://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+       gpgcheck: no
+
+   - name: Install list of packages
+     yum: pkg={{item}} state=installed
+     with_items:
+      - gcc
+      - make
+      - nginx
+      - telnet
+      - tmux
+      - vim
+      - tor
+      - transmission

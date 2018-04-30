@@ -1,0 +1,24 @@
+---
+- name: Set session timeout
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^TMOUT=.*'
+    insertbefore: '^readonly TMOUT'
+    line: 'TMOUT={{shell_timeout}}'
+    state: "{{ 'absent' if (shell_timeout == 0) else 'present' }}"
+
+- name: Set TMOUT readonly
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^readonly TMOUT'
+    insertafter: 'TMOUT={{shell_timeout}}'
+    line: 'readonly TMOUT'
+    state: "{{ 'absent' if (shell_timeout == 0) else 'present' }}"
+
+- name: Set export TMOUT
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^export TMOUT.*'
+    insertafter: 'readonly TMOUT'
+    line: 'export TMOUT'
+    state: "{{ 'absent' if (shell_timeout == 0) else 'present' }}"

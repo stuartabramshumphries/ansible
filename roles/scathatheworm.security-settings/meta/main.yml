@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: "David Ponessa"
+  description: 'Ansible Role for enforcing security settings related to enterprise compliance on enterprise grade OS.'
+  license: GPLv2
+  min_ansible_version: '2.1'
+  platforms:
+    - name: EL
+    - name: SLES
+    - name: Solaris
+      versions:
+      - 10
+  galaxy_tags:
+    - system
+    - security
+dependencies: []

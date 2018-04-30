@@ -1,0 +1,5 @@
+---
+cronie_hourly_mailto: root
+cronie_hourly_path: [ '/sbin', '/bin', '/usr/sbin', '/usr/bin' ]
+cronie_hourly_shell: /bin/bash
+...
