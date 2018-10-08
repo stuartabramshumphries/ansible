@@ -1,5 +1,3 @@
----
-- hosts: localhost
-  remote_user: root
+- hosts: all
   roles:
-    - stuart.packer
+  - { role: packages, become: yes }

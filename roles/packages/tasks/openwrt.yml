@@ -1,0 +1,5 @@
+---
+
+- name: installing default packages on an OpenWrt system
+  opkg: name={{item}} state=present update_cache=true
+  loop: "{{common_pkgs}}"

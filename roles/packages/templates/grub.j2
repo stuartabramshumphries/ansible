@@ -1,0 +1,66 @@
+# If you change this file, run 'update-grub' afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n 'Simple configuration'
+
+# The default menu entry. This may be a number, in which case it
+# identifies the Nth entry in the generated menu counted from zero.
+GRUB_DEFAULT=0
+
+# 'menu': GRUB will display the menu and then wait for the timeout to
+# expire before booting the default entry.
+#
+# 'countdown' or 'hidden': GRUB will wait for the timeout to expires before
+# displaying the menu.
+#   If <ESC> is pressed during that time, it will display
+#   the menu and wait for input.  If a hotkey associated with a menu
+#   entry is pressed, it will boot the associated menu entry immediately.
+#
+#   If the timeout expires before either of these happens, it will boot the
+#   default entry.
+#
+#   In the 'countdown' case, it will show a one-line indication of the
+#   remaining time.
+GRUB_HIDDEN_TIMEOUT_STYLE=countdown
+
+# Boot the default entry this many seconds after the menu is displayed.
+GRUB_TIMEOUT=5
+
+# set more informative menu entry
+GRUB_DISTRIBUTOR=`lsb_release --id --short 2> /dev/null || echo unknown Linux OS`
+
+# Command-line arguments to add to all menu entries for the Linux kernel
+# after those listed in 'GRUB_CMDLINE_LINUX'.
+# Unless 'GRUB_DISABLE_RECOVERY' is set to 'true', two menu entries
+#    will be generated for each Linux kernel: one default entry and one
+#    entry for recovery mode.
+{% if packages_grub_cmdline_linux |length > 0 %}
+GRUB_CMDLINE_LINUX="{{packages_grub_cmdline_linux|join(' ')}}"
+{% else %}
+#GRUB_CMDLINE_LINUX=""
+{% endif %}
+
+# Command-line arguments to add only to the default menu entry
+#GRUB_CMDLINE_LINUX_DEFAULT="{{packages_grub_cmdline_linux_default|join(' ')}}"
+
+# Uncomment to enable BadRAM filtering, modify to suit your needs
+# This works with Linux (no patch required) and with any kernel that obtains
+# the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+#GRUB_BADRAM="0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+
+# Uncomment to disable graphical terminal (grub-pc only)
+#GRUB_TERMINAL=console
+
+# The resolution used on graphical terminal
+# note that you can use only modes which your graphic card supports via VBE
+# you can see them in real GRUB with the command `vbeinfo'
+#GRUB_GFXMODE=640x480
+
+# Uncomment if you don't want GRUB to pass "root=UUID=xxx" parameter to Linux
+#GRUB_DISABLE_LINUX_UUID=true
+
+# Uncomment to disable generation of recovery mode menu entries
+#GRUB_DISABLE_RECOVERY="true"
+
+# Uncomment to get a beep at grub start
+#GRUB_INIT_TUNE="480 440 1"

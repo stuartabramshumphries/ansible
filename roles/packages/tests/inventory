@@ -1,1 +1,1 @@
-localhost
+localhost ansible_ssh_host=localhost ansible_connection=local

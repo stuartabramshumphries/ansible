@@ -1,5 +1,101 @@
 ---
-# tasks file for stuart.packer
-# Install apt packages and repositories
-- include: apt.yml
-  when: ansible_pkg_mgr == "apt"
+
+- name: load OS specific variables
+  include_vars: "{{ansible_facts['os_family']}}.yml"
+  when: ansible_facts['distribution'] != "CentOS"
+
+- name: load Centos specific variables
+  include_vars: "{{ansible_facts['distribution']}}.yml"
+  when: ansible_facts['distribution'] == "CentOS"
+
+- include_tasks: RedHat.yml
+  when: ansible_facts['os_family'] == "RedHat"
+
+- include_tasks: openwrt.yml
+  when: ansible_facts['distribution'] == "OpenWrt"
+
+  # This task would attempt to install all available packages on ubuntu,
+  # therefore to upgrade all installed packages, the apt module should be used
+  # with upgrade=safe option
+- name: upgrade all packages on non-Debian hosts
+  package: name=* state={{packages_state}}
+  when:
+    - packages_state == "latest"
+    - ansible_facts['distribution'] != "OpenWrt"
+    - ansible_facts['os_family'] != "Debian"
+
+- name: update apt cache on Debian hosts
+  apt:
+    update_cache: True
+  when:
+    - ansible_facts['os_family'] == "Debian"
+
+- name: upgrade all packages on Debian hosts
+  apt:
+    only_upgrade: True
+  when:
+    - packages_state == "latest"
+    - ansible_facts['os_family'] == "Debian"
+
+- name: installing default packages
+  package: name={{common_pkgs}} state={{packages_state}}
+  # ignore_errors: "{{True if packages_state == 'installed' else False}}"
+  when: ansible_facts['distribution'] != "OpenWrt"
+
+  # this task must be after the package installation because it with fail it
+  # the sudo package isn't priorly installed.
+- name: ensure there is no requiretty or always_set_home in sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "{{item['regexp']}}"
+    line: "{{item['line']}}"
+    validate: 'visudo -cf %s'
+    backrefs: yes
+    state: present
+  loop:
+    - { regexp: '^Defaults.*requiretty', line: 'Defaults    !requiretty' }
+    - { regexp: '^Default.*always_set_home', line: '# Defaults  set_home' }
+    - { regexp: '^Defaults.*secure_path = /sbin:/bin:/usr/sbin:/usr/bin', line: 'Defaults   secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin' }
+
+### Grub
+
+# - name: add grub boot options (quirks for some hardware)
+#   set_fact:
+#     packages_grub_cmdline_linux: "{{packages_grub_cmdline_linux + ['nox2apic']}}"
+#   when: ansible_facts['product_version'] == "ThinkPad W530"
+
+# - name: template grub
+#   template:
+#     src: grub.j2
+#     dest: /etc/default/grub
+#     owner: root
+#     group: root
+#     mode: 0644
+#     backup: yes
+#   notify: update grub
+#   when:  ansible_facts['os_family'] == 'Debian'
+
+### OS limits and kernel tweaks
+- import_tasks: kernel.yml
+
+### mounts
+
+- name: adding mounts to fstab
+  mount:
+    src: "{{item.dev}}"
+    name: "{{item.path}}"
+    fstype: "{{item.fstype}}"
+    state: "{{item.state|default('mounted')}}"
+    opts: "{{item.opts}}"
+    passno: "{{item.passno|default('2')}}"
+    dump: "{{item.dump|default('1')}}"
+  loop: "{{mounts}}"
+  when: mounts is defined
+
+- name: adjust mountpoints group ownership
+  file:
+    path: "{{item.path}}"
+    group: "{{item.group}}"
+    state: directory
+  loop: "{{mounts}}"
+  when: mounts is defined

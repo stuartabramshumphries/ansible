@@ -1,0 +1,5 @@
+---
+
+github_account: archf
+todos:
+  - use quiet and splash grub options only on desktop, leave servers as they are

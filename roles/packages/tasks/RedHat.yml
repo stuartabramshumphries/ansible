@@ -1,0 +1,125 @@
+---
+
+# requires package 'libselinux-python'
+# errors are ignored in case selinux is just not installed.
+# a better way would be to check for the presence of /etc/selinux/config
+# NOTE: disabling selinux requires a reboot.
+- name: ensure selinux is '{{selinux_state}}' on RedHat derivatives
+  selinux: state={{packages_selinux_state}}
+  ignore_errors: true
+  tags: selinux
+
+#  When repos' fqdn are returning AAAA records and there are no IPV6
+#  connectivity, pycurl doesn't fallback on ipv4. Not tested when IPV6INIT=no.
+#  This task is also in the the 'archf.accounts' role as a few packages
+#  explicitly redquired for that roles installed only for the role a there as
+#  well.
+- name: force yum on RedHat <7 and derivatives to use ipv4
+  lineinfile:
+    line: "ip_resolve=4"
+    insertafter: "^gpgcheck*"
+    dest: /etc/yum.conf
+    state: present
+  when: ansible_facts['distribution_major_version']|int < 7
+  tags: repos
+
+- name: register configured repositories
+  find:
+    paths: "/etc/yum.repos.d/"
+    patterns: "*.repo"
+  register: installed_repofiles
+  tags: repos
+
+- name: create repos backup directory
+  file:
+    path: /etc/yum.repos.d.backup
+    state: directory
+  tags: repos
+
+# - debug: msg={{installed_repofiles['files']|map(attribute='path')|list}}
+
+- name: configuring yum repositories
+  block:
+
+  - name: backup unrequired repo files
+    copy:
+      src: "{{item}}"
+      dest: "/etc/yum.repos.d.backup/"
+      remote_src: yes
+    loop: "{{installed_repofiles['files']|map(attribute='path')|list}}"
+
+  - name: install yum repositories
+    yum_repository:
+      # main options
+      name: "{{item[1]['name']}}"
+      description: "{{ansible_facts['distribution']}}-{{ansible_facts['distribution_major_version']}} - {{item[1]['name']}} packages"
+      baseurl: "{{item[1]['baseurl']|default(omit)}}"
+      enabled: "{{item[1]['enabled']|default(omit)}}"
+      gpgkey: "{{item[1]['gpgkey']|default(omit)}}"
+      gpgcheck: "{{item[1]['gpgcheck']|default(omit)}}"
+      # dest file options: defaults to the value of 'name'
+      file: "{{item[0]['file']|default(omit)}}"
+      owner: "{{item[0]['owner']|default('root')}}"
+      group: "{{item[0]['group']|default('root')}}"
+      mode: "{{item[0]['mode']|default('0644')}}"
+      state: "{{item[1]['state']|default(omit)}}"
+      # yum behavior
+      # Determines whether or not yum keeps the cache of headers
+      # and packages after successful installation (module defaults to 1)
+      keepcache: "{{item[1]['keepcache']|default(omit)}}"
+      priority: "{{item[1]['priority']|default(omit)}}"
+      # not in use yet
+      # parameter: "{{item[1]['parameter']|default(omit)}}"
+      # async: "{{item[1]['async']|default(omit)}}"
+      # bandwidth: "{{item[1]['bandwidth']|default(omit)}}"
+      # cost: "{{item[1]['cost']|default(omit)}}"
+      # deltarpm_metadata_percentage: "{{item[1]['deltarpm_metadata_percentage']|default(omit)}}"
+      # deltarpm_percentage: "{{item[1]['deltarpm_percentage']|default(omit)}}"
+      # enablegroups: "{{item[1]['enablegroups']|default(omit)}}"
+      # exclude: "{{item[1]['exclude']|default(omit)}}"
+      # failovermethod: "{{item[1]['failovermethod']|default(omit)}}"
+      # gpgcakey: "{{item[1]['gpgcakey']|default(omit)}}"
+      # http_caching: "{{item[1]['http_caching']|default(omit)}}"
+      # include: "{{item[1]['include']|default(omit)}}"
+      # includepkgs: "{{item[1]['includepkgs']|default(omit)}}"
+      # ip_resolve: "{{item[1]['ip_resolve']|default(omit)}}"
+      # keepalive: "{{item[1]['keepalive']|default(omit)}}"
+      # metadata_expire: "{{item[1]['metadata_expire']|default(omit)}}"
+      # metadata_expire_filter: "{{item[1]['metadata_expire_filter']|default(omit)}}"
+      # metalink: "{{item[1]['metalink']|default(omit)}}"
+      # mirrorlist: "{{item[1]['mirrorlist']|default(omit)}}"
+      # mirrorlist_expire: "{{item[1]['mirrorlist_expire']|default(omit)}}"
+      # params: "{{item[1]['params']|default(omit)}}"
+      # password: "{{item[1]['password']|default(omit)}}"
+      # protect: "{{item[1]['protect']|default(omit)}}"
+      # proxy: "{{item[1]['proxy']|default(omit)}}"
+      # proxy_password: "{{item[1]['proxy_password']|default(omit)}}"
+      # proxy_username: "{{item[1]['proxy_username']|default(omit)}}"
+      # repo_gpgcheck: "{{item[1]['repo_gpgcheck']|default(omit)}}"
+      # reposdir: "{{item[1]['reposdir']|default(omit)}}"
+      # retries: "{{item[1]['retries']|default(omit)}}"
+      # s3_enabled: "{{item[1]['s3_enabled']|default(omit)}}"
+      # selevel: "{{item[1]['selevel']|default(omit)}}"
+      # serole: "{{item[1]['serole']|default(omit)}}"
+      # setype: "{{item[1]['setype']|default(omit)}}"
+      # seuser: "{{item[1]['seuser']|default(omit)}}"
+      # skip_if_unavailable: "{{item[1]['skip_if_unavailable']|default(omit)}}"
+      # ssl_check_cert_permissions: "{{item[1]['ssl_check_cert_permissions']|default(omit)}}"
+      # sslcacert: "{{item[1]['sslcacert']|default(omit)}}"
+      # sslclientcert: "{{item[1]['sslclientcert']|default(omit)}}"
+      # sslclientkey: "{{item[1]['sslclientkey']|default(omit)}}"
+      # sslverify: "{{item[1]['sslverify']|default(omit)}}"
+      # throttle: "{{item[1]['throttle']|default(omit)}}"
+      # timeout: "{{item[1]['timeout']|default(omit)}}"
+      # ui_repoid_vars: "{{item[1]['ui_repoid_vars']|default(omit)}}"
+      # unsafe_writes: "{{item[1]['unsafe_writes']|default(omit)}}"
+      # username: "{{item[1]['username']|default(omit)}}"
+    # loop: lookup('subelements', {{packages_repos|default(omit)|selectattr('repos', 'defined')|list}}, repos)
+    loop: lookup('subelements', {{packages_repos|selectattr('repos', 'defined')|list}}, repos)
+    when:
+      - packages_repos is defined
+      - item|basename not in packages_repos|map(attribute='file')
+    tags: repos
+
+# - name: Update package management cache (YUM)
+#   command: yum clean all
