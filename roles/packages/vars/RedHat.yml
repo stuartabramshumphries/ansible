@@ -1,37 +1,34 @@
 ---
-
 # List of packages to install by default on any rhel family system.
 common_pkgs:
-  - urlview
-  - mosh
-  - sudo
-  - git
-  - make
-  - tree
-  - openssh-server
-  - gdisk
-  - rsync
-  - ncurses-devel
-  - ncurses
-  - nmap
-  - vim-common
-  - vim-X11
-  - zsh
   - curl
-  - wget
-  - libselinux-python
-  - man
-  - tcpdump
-  - iotop
-  - iftop
-  - strace
-  - mlocate
-  - unzip
-  # versatile replacement for vmstat, iostat and ifstat
   - dstat
-  - yum-utils
+  - python3-flake8
+  - gdisk
+  - git
+  - htop
+  - iftop
+  - iotop
+  - make
+  - man
+  - plocate
+  - mosh
+  - ncurses
+  - ncurses-devel
+  - nmap
+  - openssh-server
+  - python3-pip
+  - rsync
+  - strace
+  - sudo
+  - tcpdump
+  - tmux
+  - tree
+  - unzip
+  - urlview
+  - vim-X11
+  - vim-common
+  - wget
   - xorg-x11-xauth
-  # - sysstat
-  # - tmux
-  # - htop
-  # - python3
+  - yum-utils
+  - zsh

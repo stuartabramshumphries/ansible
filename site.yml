@@ -3,12 +3,14 @@
   hosts: all
   roles:
 #    - scathatheworm.security-settings
-    - ansible-role-ntpd
     - role: logrotate
       logrotate_backlog_size: 52
     - role: packages
+      tags: pkgs
+    - role: filedefs
+      tags: files
     - role: franklinkim.sudo
       vars:
         sudo_users:
-          - name: 'stuart'
+          - name: 'zaphod'
             nopasswd: yes

@@ -1,6 +1,0 @@
----
-- hosts: all
-  tasks:
-  - name: addusers
-    action: user name={{ item.key }} password={{ item.value.password }} shell={{ item.value.shell }} state={{ item.value.state }} update_password=always
-    

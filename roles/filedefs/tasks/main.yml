@@ -1,0 +1,8 @@
+---
+
+- name: replace line
+  lineinfile:
+    path: /etc/profile.d/nano-default-editor.sh
+    regexp: '^(.*)(export EDITOR=.*)$' 
+    line: 'export EDITOR="/usr/bin/vi"'
+    backrefs: yes
