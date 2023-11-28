@@ -1,0 +1,30 @@
+---
+- name: load OS specific variables
+  include_vars: "{{ansible_facts['os_family']}}.yml"
+  when: ansible_facts['distribution'] != "CentOS"
+
+- name: load Centos specific variables
+  include_vars: "{{ansible_facts['distribution']}}.yml"
+  when: ansible_facts['distribution'] == "CentOS"
+
+- include_tasks: RedHat.yml
+  when: ansible_facts['os_family'] == "RedHat"
+
+
+- name: update apt cache on Debian hosts
+  apt:
+    update_cache: True
+  when:
+    - ansible_facts['os_family'] == "Debian"
+
+- name: upgrade all packages on Debian hosts
+  apt:
+    only_upgrade: True
+  when:
+    - packages_state == "latest"
+    - ansible_facts['os_family'] == "Debian"
+
+- name: installing default packages
+  package: name={{common_pkgs}} state={{packages_state}}
+  # ignore_errors: "{{True if packages_state == 'installed' else False}}"
+

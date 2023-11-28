@@ -1,0 +1,17 @@
+---
+
+# Packages installation behavior.
+packages_state: latest
+
+# Selinux state.
+packages_selinux_state: disabled
+
+# List of grub boot options assigned to GRUB_CMDLINE_LINUX_DEFAULT.
+# Many distribution defaults to GRUB_CMDLINE_LINUX_DEFAULT="quiet splash".
+packages_grub_cmdline_linux_default:
+  - quiet
+  - splash
+
+# List of boot option a assigned both to normal and recovery entry of each
+# kernel.
+packages_grub_cmdline_linux: []

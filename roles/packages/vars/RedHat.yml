@@ -1,0 +1,35 @@
+---
+# List of packages to install by default on any rhel family system.
+common_pkgs:
+  - curl
+  - dstat
+  - python3-flake8
+  - gdisk
+  - git
+  - htop
+  - iftop
+  - iotop
+  - make
+  - man
+  - mosh
+  - ncurses
+  - ncurses-devel
+  - nmap
+  - openssh-server
+  - plocate
+  - python3-pip
+  - rsync
+  - strace
+  - sudo
+  - tcpdump
+  - tmux
+  - tree
+  - tuned
+  - unzip
+  - urlview
+  - vim-X11
+  - vim-common
+  - wget
+  - xorg-x11-xauth
+  - yum-utils
+  - zsh

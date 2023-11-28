@@ -22,6 +22,8 @@
   become: true
   roles:
     - base
+    - packages
+    - geerlingguy.docker
       
 - hosts: workstations
   become: true

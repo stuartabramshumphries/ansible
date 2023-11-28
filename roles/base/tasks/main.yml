@@ -3,6 +3,8 @@
     name: stuart
     comment: Stuart Abrams-Humphries
     uid: 2000
+    shell: /bin/bash
+    password: "$y$j9T$4vywTVCyonh0yJNeQP6Vp0$leqCbOt9i1JrC9iMQ2OzTfmjG07xdjkjpdBSnjhRe87"
       #group: admin
 
 - name: add ssh key for vagrant
@@ -25,7 +27,7 @@
     mode: 0644
   notify: restart_sshd
 
-- name: add sudoers file for vagrant
+- name: add sudoers file for all authorised users
   tags: always
   copy:
     src: "{{ item }}"
