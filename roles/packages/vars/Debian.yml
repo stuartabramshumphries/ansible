@@ -47,6 +47,7 @@ common_pkgs:
   - strace
   - plocate
   - i3-wm
+  - cowsay
   - unzip
   # versatile replacement for vmstat, iostat and ifstat
   - dstat

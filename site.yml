@@ -21,9 +21,12 @@
 - hosts: all
   become: true
   roles:
-    - base
-    - packages
-    - geerlingguy.docker
+    - role: base
+      tags: base
+    - role: packages
+      tags: pkgs
+    - role: geerlingguy.docker
+      tags: docker
       
 - hosts: workstations
   become: true
