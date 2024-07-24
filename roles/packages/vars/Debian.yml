@@ -3,7 +3,6 @@
 # List of packages to install by default on any debian family system.
 common_pkgs:
   - awesome
-  - cowsay
   - curl
   - curl
   - dstat
@@ -12,7 +11,6 @@ common_pkgs:
   - gdisk
   - git
   - htop
-  - i3-wm
   - iftop
   - iotop
   - iotop

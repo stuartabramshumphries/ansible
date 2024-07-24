@@ -1,11 +1,2 @@
-[web_servers]
-ub1
-
-[db_servers]
-ub2
-
-[file_servers]
-ub3
-
 [workstations]
-stlucia
+zaphod

@@ -1,22 +1,22 @@
-- name: add stuart as a user
-  user:
-    name: stuart
-    comment: Stuart Abrams-Humphries
-    uid: 2000
-    shell: /bin/bash
-    password: "$y$j9T$4vywTVCyonh0yJNeQP6Vp0$leqCbOt9i1JrC9iMQ2OzTfmjG07xdjkjpdBSnjhRe87"
-      #group: admin
-
-- name: add ssh key for vagrant
-  authorized_key:
-    user: vagrant
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDDFKXMIafzQFacLs0RyQoeTvjFrtR4R2FIlOsvQXOfg ansible"
-
-- name: add ssh key for stuart
-  authorized_key:
-    user: stuart
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDB78d2SEKayFRlYwKvOmeYIWgmdyurARH6lO/1Us9GNnGNK+X/pjKvLBhvZXlNtk9B+z8z802jFdHf8mgGgzhR2EwmaEXpME0eHLhjU/uL4DyJwUOsJXLXQ4rFF8y9eVeanoiIKKCVSlD1YZKCGkJ0ogoGzRCqnAod1fBsvCGW+/bMxcFs70z4aDKdlGmvHZNWMkCQTbWvSMEZ+2MjKhlsS0J+Oaq6EArXO+k2daqgqKxnvBdXSX59WjV/tjv/d7YgG+BA5E5iM33sAUxUsbQHqohH6Vz3arv/aOIFI95Ci8IDG6lEh8L4pR42/Zy43qxjtuWKOTkhJF8tgUTymy3fJ7AkK2w33MkJgmtnoEu6LR2x3kf1XI30VaGf6MjfoNlwssOIUQzrIpqAJ0egMXq4eQfLdmYFHnRUb69ek/MgPoG/uteIZ6O5tz+4kT2OOJEsBDnKwQRGLy8x+w53Klb4zWlunJx5tcnFvHR3jyZk5O01k7+9ZfOU98PwbQhc458= stuart@stlucia"
-
+#- name: add stuart as a user
+#  user:
+#    name: stuart
+#    comment: Stuart Abrams-Humphries
+#    uid: 2000
+#    shell: /bin/bash
+#    password: "$y$j9T$4vywTVCyonh0yJNeQP6Vp0$leqCbOt9i1JrC9iMQ2OzTfmjG07xdjkjpdBSnjhRe87"
+#      #group: admin
+#
+#- name: add ssh key for vagrant
+#  authorized_key:
+#    user: vagrant
+#    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDDFKXMIafzQFacLs0RyQoeTvjFrtR4R2FIlOsvQXOfg ansible"
+#
+#- name: add ssh key for stuart
+#  authorized_key:
+#    user: stuart
+#    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDB78d2SEKayFRlYwKvOmeYIWgmdyurARH6lO/1Us9GNnGNK+X/pjKvLBhvZXlNtk9B+z8z802jFdHf8mgGgzhR2EwmaEXpME0eHLhjU/uL4DyJwUOsJXLXQ4rFF8y9eVeanoiIKKCVSlD1YZKCGkJ0ogoGzRCqnAod1fBsvCGW+/bMxcFs70z4aDKdlGmvHZNWMkCQTbWvSMEZ+2MjKhlsS0J+Oaq6EArXO+k2daqgqKxnvBdXSX59WjV/tjv/d7YgG+BA5E5iM33sAUxUsbQHqohH6Vz3arv/aOIFI95Ci8IDG6lEh8L4pR42/Zy43qxjtuWKOTkhJF8tgUTymy3fJ7AkK2w33MkJgmtnoEu6LR2x3kf1XI30VaGf6MjfoNlwssOIUQzrIpqAJ0egMXq4eQfLdmYFHnRUb69ek/MgPoG/uteIZ6O5tz+4kT2OOJEsBDnKwQRGLy8x+w53Klb4zWlunJx5tcnFvHR3jyZk5O01k7+9ZfOU98PwbQhc458= stuart@stlucia"
+#
 - name: generate sshd_config file from template
   tags: ssh
   template:
